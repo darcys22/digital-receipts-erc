@@ -1,0 +1,18 @@
+## Keys
+
+Goerli address used to test deploy digital receipts contract:
+0xF9B7F9f82A86cd47Ae76D8FDd289daDe44f9Fe15
+
+Private Key for deployer:
+6be0edb53dd11615417c5cdb300aa44c3cdaf3bab7861ea914a25a4988b57a99
+6be0edb53dd11615417c5cdb300aa44c3cdaf3bab7861ea914a25a4988b57a99
+
+## Test contracts
+Contract Address:
+0xC7BdacF7983f33a8d3B3AF3ABc720d30f66f76E5
+
+https://goerli.etherscan.io/
+https://goerli.etherscan.io/address/0xC7BdacF7983f33a8d3B3AF3ABc720d30f66f76E5
+
+## website to get abi encoded construction params
+https://abi.hashex.org/
