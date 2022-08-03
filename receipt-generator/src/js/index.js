@@ -6,6 +6,22 @@ import items from "./libs/items";
 import download from "./libs/download";
 import moment from "moment";
 
+// WEB3 STUFF
+import Web3 from 'web3';
+import { BlockHeader, Block } from 'web3-eth' // ex. package types
+
+const CONFIG = require('../config/config');
+
+const ethEnabled = async () => {
+  if (window.ethereum) {
+    await window.ethereum.request({method: 'eth_requestAccounts'});
+    window.web3 = new Web3(window.ethereum);
+    return true;
+  }
+  return false;
+}
+
+
 /**
  * Do things when document is ready
  */
@@ -35,6 +51,7 @@ import moment from "moment";
 
       // Load event listeners.
       app.loadEvents();
+
     },
 
     /**
@@ -107,6 +124,35 @@ import moment from "moment";
       return html;
     },
 
+    claimNFTS: () => {
+      let cost = CONFIG.WEI_COST;
+      let gasLimit = CONFIG.GAS_LIMIT;
+      let totalCostWei = String(cost * mintAmount);
+      let totalGasLimit = String(gasLimit * mintAmount);
+      console.log("Cost: ", totalCostWei);
+      console.log("Gas limit: ", totalGasLimit);
+      setFeedback(`Minting your ${CONFIG.NFT_NAME}...`);
+      blockchain.smartContract.methods
+        .mint(mintAmount)
+        .send({
+          gasLimit: String(totalGasLimit),
+          to: CONFIG.CONTRACT_ADDRESS,
+          from: blockchain.account,
+          value: totalCostWei,
+        })
+        .once("error", (err) => {
+          console.log(err);
+          utils.showError( "Sorry, something went wrong please try again later." );
+        })
+        .then((receipt) => {
+          console.log(receipt);
+          setFeedback(
+            `WOW, the ${CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
+          );
+          dispatch(fetchData(blockchain.account));
+        });
+    },
+
     /**
      * Load event listers
      */
@@ -128,6 +174,16 @@ import moment from "moment";
         .on( "click", ".remove-item-row", ( e ) => {
           e.preventDefault();
           items.remove( e.currentTarget );
+        } )
+
+        /**
+         * Click event for connect to wallet
+         * @param {event} e event object.
+         */
+        .on( "click", "#connect-wallet", ( e ) => {
+          e.preventDefault();
+          console.log("stuff todo sean remove this");
+          ethEnabled();
         } )
 
         /**
@@ -170,6 +226,8 @@ import moment from "moment";
 
           // Generate receipt image raw html.
           const html = app.generateRawHtml( form );
+
+          //const nft = app.claimNFTs();
 
           // Setup Ajax call for api call.
           $.ajax( {
@@ -249,6 +307,7 @@ import moment from "moment";
           // Open modal.
           modal.open();
         } )
+
 
         /**
          * Click event for modal close button.

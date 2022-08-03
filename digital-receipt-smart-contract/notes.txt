@@ -1,0 +1,13 @@
+## Keys
+
+
+## Test contracts
+Contract Address:
+0x48cC12157C6ABeb4739b61469fbb6e5A17f18255
+
+https://rinkeby.etherscan.io/
+https://rinkeby.etherscan.io/address/0x48cC12157C6ABeb4739b61469fbb6e5A17f18255
+
+
+## website to get abi encoded construction params
+https://abi.hashex.org/
