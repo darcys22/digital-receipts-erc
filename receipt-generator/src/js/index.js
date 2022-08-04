@@ -22,6 +22,8 @@ const ethEnabled = async () => {
 }
 
 
+
+
 /**
  * Do things when document is ready
  */
@@ -68,6 +70,9 @@ const ethEnabled = async () => {
       const paymentType = form.find( ":input[name='payment_type']" ).val();
       const items = form.find( "input[name='price[]']" );
 
+ 
+
+
       let tax = form.find( ":input[name='tax']" ).val();
       let curr = currency !== "" ? currency : "";
       let total = 0.0;
@@ -86,7 +91,7 @@ const ethEnabled = async () => {
       html += '<body>';
       html += '<div id="receipt">';
       html += '<div class="address">';
-      html += '<p>' + business + '</p>';
+      html += '<p>' + 'test' + business + '</p>';
       html += '<p>' + utils.nl2br( address ) + '</p>';
       html += '</div>';
       html += '<p class="date">' + utils.nl2br( date ) + '</p>';
@@ -114,6 +119,8 @@ const ethEnabled = async () => {
         tax = parseFloat( tax ).toFixed( 2 );
         total = parseFloat( parseFloat( total ) + parseFloat( tax ) ).toFixed( 2 );
         html += '<tr><th colspan="3">' + taxType + ':</th><td>' + curr + '' + tax + '</td></tr>';
+        
+        console.log("DEV: tax does not equal null")
       }
 
       html += '<tr><th colspan="3">Total:</th><td>' + curr + '' + total + '</td></tr>';
@@ -252,6 +259,29 @@ const ethEnabled = async () => {
               app.processing = true;
               btn.attr( "disabled", true );
               modal.close();
+
+              // // Assigning form values to variables to prepare them for JSON
+              // // Only here so I can hijack the existing click event for this output.
+              // //-N.D
+
+              // Currently just futzing around with the variables here to see if I can get all the fields to output into the console first, and once I do
+              // I'll shove them into a JSON to prepare for the api
+              //N.D 12:30 - 05/08/2022
+
+              console.log(date.value);
+              console.log(business.value);
+              console.log(address.value);
+              console.log(currency.value);
+              // console.log(taxType.value);
+              console.log(form.find( ":input[name='payment_type']" ).val());
+              // console.log(items.value);
+
+              console.log(tax.value);
+              // console.log(curr.value);
+              console.log(form.find( ":input[name='tax_type']" ).val());
+              console.log(form.find( "input[name='price[]']" ).val());
+              
+              
             },
             success: ( response ) => {
               // Check if response has success reponse?
