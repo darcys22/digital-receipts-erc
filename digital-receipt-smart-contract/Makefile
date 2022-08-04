@@ -7,4 +7,4 @@ compile:
 	npx hardhat compile
 
 deploy:
-	npx hardhat run scripts/deploy-digital-receipts-contract.js --network rinkeby
+	npx hardhat run scripts/deploy-digital-receipts-contract.js --network goerli

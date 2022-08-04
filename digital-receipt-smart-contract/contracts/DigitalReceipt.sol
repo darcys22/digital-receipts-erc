@@ -1,25 +1,23 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
 
-import "./ERC721A.sol";
+pragma solidity ^0.8.10;
+
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract DigitalReceipt is ERC721A, Ownable {
+contract DigitalReceipt is ERC721, Ownable {
   using Strings for uint256;
 
   string baseURI;
   string public baseExtension = ".json";
 
   constructor(
-    string memory _name,
-    string memory _symbol,
-    string memory _initBaseURI,
-  ) ERC721A(_name, _symbol, 100) {
+    string memory _initBaseURI
+  ) ERC721("DigitalReceipt", "NFTDR") {
     setBaseURI(_initBaseURI);
   }
 
-  function mintPublic() external payable {
+  function mint() external payable {
     _safeMint(msg.sender, 1);
   }
 
@@ -32,9 +30,6 @@ contract DigitalReceipt is ERC721A, Ownable {
       _exists(_tokenId),
       "ERC721Metadata: URI query for nonexistent token"
     );
-    if(revealed == false) {
-        return notRevealedUri;
-    }
 
     string memory currentBaseURI = _baseURI();
     return bytes(currentBaseURI).length > 0

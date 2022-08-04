@@ -1,7 +1,7 @@
 const chalk = require('chalk')
 const fs = require('fs')
 
-const name = "digitalreceipts"
+const name = "DigitalReceipt"
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -10,10 +10,10 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Token = await ethers.getContractFactory("Hoomans");
+  const Token = await ethers.getContractFactory(name);
 
-  // Description, Token, Metadata URL, Hidden URL
-  const token = await Token.deploy("Digital Receipts", "NFTDR", "");
+  // Metadata URL
+  const token = await Token.deploy("");
 
   console.log(
     '  ',

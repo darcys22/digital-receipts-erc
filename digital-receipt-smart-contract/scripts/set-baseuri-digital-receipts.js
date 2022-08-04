@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const fs = require('fs')
 const baseuri = "ipfs://QmPbKbKyp8vbxv3enQPNSyRW7y54xLEtVMaK5jFpbqUagv/";
 
-const name = "DigitalReceipts"
+const name = "DigitalReceipt"
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -18,7 +18,7 @@ async function main() {
 
   console.log(
     '  ',
-    chalk.cyan("Digital Receipts"),
+    chalk.cyan("DigitalReceipt"),
     'contract address: ',
     chalk.greenBright(data),
   )
@@ -31,7 +31,7 @@ async function main() {
 
   console.log(
     '  ',
-    chalk.cyan("Digital Receipts"),
+    chalk.cyan("DigitalReceipt"),
     'set baseURI to: ',
     chalk.greenBright(baseuri),
   );

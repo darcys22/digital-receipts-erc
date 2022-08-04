@@ -40,9 +40,9 @@ module.exports = {
       chainId: 1,
       accounts,
     },
-    rinkeby: {
-      url: process.env.RINKEBY_RPC_URL ?? "",
-      chainId: 4,
+    goerli: {
+      url: process.env.GOERLI_RPC_URL ?? "",
+      chainId: 5,
       accounts,
     },
   },
