@@ -31,16 +31,18 @@ One of the major roadblocks to fully automating our current finance world is tha
 Transaction Flow:
  - A customer purchases an item from an online retailer, checking out leads the customer to payment through a smart contract.
  - The smart contract verifys the amount transferred matches the order and provides the user with an Digital Receipt Non-Fungible Token.
- - When fulfilling the order, the retailer will upload the digital receipt specified in (1) below, using the encryption method specified in (2) which is encrypted against the customers public key.
+ - When fulfilling the order, the retailer will upload the digital receipt specified in (1) below, optionally using the encryption method specified in (2) which is encrypted against a derivative of the customers public key.
 
 The elements of a Non-Fungible Token Digital Receipt as follows:
 
 1) Digital Receipt JSON Schema
+2) Optional Digital Receipt Encryption
 
-This refers to the structure of the JSON digital receipt:
 
-### JSON schema
-This refers to the high level receipt
+### 1) Digital Receipt JSON Schema
+The JSON schema is composed of 2 parts. One for the high level details in the receipt (for example Date and Vendor) and another for the line items contained in the receipt.
+
+#### High level details
 ```json
 {
   "id": "receipt.json#",
@@ -149,11 +151,17 @@ This refers to the high level receipt
       "description": "Any messages/comments the issuer wishes to convey to the customer",
       "type": "string"
     }
+    "image": {
+      "title": "Image",
+      "description": "Viewable/Printable Image of the Digital Receipt",
+      "type": "string",
+      "format": "date"
+    },
   }
 }
 ```
 
-This schema refers to the individual line items on the receipt
+#### Individual line items on receipt
 ```json
 {
   "type": "object",
@@ -207,8 +215,9 @@ This schema refers to the individual line items on the receipt
 ```
 
 
-2) Metadata and Encryption of Digital Receipt
+### 2) Optional Digital Receipt Encryption
 
+The encryption extension is OPTIONAL for digital receipt non fungible tokens. This allows your receipt to encrypted so only the intended recipients can view the data contained.
 This refers to the structure of the data pointed at by the NFT's url
 
 ### UUID
