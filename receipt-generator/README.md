@@ -8,13 +8,15 @@ install dependencies
 yarn install
 ```
 
+Then run both the frontend and backend using
 ```
 yarn dev
+yarn api
 ```
 
-## Show your support
+## Giving Recognition to the original author of the non-cryptocurrency related receipt app
 
-Please show support to the original author of this repo. Star the repository and follow him on [Twitter](https://twitter/vijayhardaha/) if this project helped you!
+Please show support to the original creator of the receipt generator app. I simply forked it and added crypto! Star the repository and follow him on [Twitter](https://twitter/vijayhardaha/) if this project helped you!
 
 Forked originally from https://github.com/vijayhardaha/receipt-generator
 

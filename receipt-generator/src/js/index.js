@@ -8,11 +8,23 @@ import moment from "moment";
 
 // WEB3 STUFF
 import Web3 from 'web3';
-import { BlockHeader, Block } from 'web3-eth' // ex. package types
-
-const CONFIG = require('../config/config');
+import Web3EthContract from "web3-eth-contract";
 
 const ethEnabled = async () => {
+  const abiResponse = await fetch(process.env.API_URL + "config/abi.json", {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+  window.abi = await abiResponse.json();
+  const configResponse = await fetch(process.env.API_URL + "config/config.json", {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+  window.CONFIG = await configResponse.json();
   if (window.ethereum) {
     await window.ethereum.request({method: 'eth_requestAccounts'});
     window.web3 = new Web3(window.ethereum);
@@ -20,9 +32,6 @@ const ethEnabled = async () => {
   }
   return false;
 }
-
-
-
 
 /**
  * Do things when document is ready
@@ -69,9 +78,6 @@ const ethEnabled = async () => {
       const taxType = form.find( ":input[name='tax_type']" ).val();
       const paymentType = form.find( ":input[name='payment_type']" ).val();
       const items = form.find( "input[name='price[]']" );
-
- 
-
 
       let tax = form.find( ":input[name='tax']" ).val();
       let curr = currency !== "" ? currency : "";
@@ -131,33 +137,51 @@ const ethEnabled = async () => {
       return html;
     },
 
-    claimNFTS: () => {
-      let cost = CONFIG.WEI_COST;
-      let gasLimit = CONFIG.GAS_LIMIT;
-      let totalCostWei = String(cost * mintAmount);
-      let totalGasLimit = String(gasLimit * mintAmount);
-      console.log("Cost: ", totalCostWei);
-      console.log("Gas limit: ", totalGasLimit);
-      setFeedback(`Minting your ${CONFIG.NFT_NAME}...`);
-      blockchain.smartContract.methods
-        .mint(mintAmount)
-        .send({
-          gasLimit: String(totalGasLimit),
-          to: CONFIG.CONTRACT_ADDRESS,
-          from: blockchain.account,
-          value: totalCostWei,
-        })
-        .once("error", (err) => {
-          console.log(err);
-          utils.showError( "Sorry, something went wrong please try again later." );
-        })
-        .then((receipt) => {
-          console.log(receipt);
-          setFeedback(
-            `WOW, the ${CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
-          );
-          dispatch(fetchData(blockchain.account));
-        });
+    claimNFTs: async () => {
+      if (window.ethereum) {
+        Web3EthContract.setProvider(window.ethereum);
+        try {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const networkId = await window.ethereum.request({
+            method: "net_version",
+          });
+          if (networkId == window.CONFIG.NETWORK.ID) {
+            const SmartContractObj = new Web3EthContract(
+              window.abi,
+              window.CONFIG.CONTRACT_ADDRESS
+            );
+            let gasLimit = window.CONFIG.GAS_LIMIT;
+            console.log("Gas limit: ", gasLimit);
+            //setFeedback(`Minting your ${window.CONFIG.NFT_NAME}...`);
+            console.log(`TODO sean remove this Minting your ${window.CONFIG.NFT_NAME}...`);
+            await SmartContractObj.methods
+              .mint()
+              .send({
+                gasLimit: String(totalGasLimit),
+                to: window.CONFIG.CONTRACT_ADDRESS,
+                from: accounts[0],
+              })
+              .once("error", (err) => {
+                console.log(err);
+                utils.showError( "Sorry, something went wrong please try again later." );
+              })
+              .then((receipt) => {
+                //setFeedback(
+                  //`WOW, the ${window.CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
+                //);
+                console.log(`TODO sean delete this WOW, the ${window.CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`);
+              });
+          } else {
+            utils.showError(`Change network to ${window.CONFIG.NETWORK.NAME}.`);
+          }
+        } catch (err) {
+          utils.showError("Something NFT went wrong.");
+        }
+      } else {
+        utils.showError("Install Metamask.");
+      }
     },
 
     /**
@@ -189,7 +213,6 @@ const ethEnabled = async () => {
          */
         .on( "click", "#connect-wallet", ( e ) => {
           e.preventDefault();
-          console.log("stuff todo sean remove this");
           ethEnabled();
         } )
 
@@ -234,13 +257,11 @@ const ethEnabled = async () => {
           // Generate receipt image raw html.
           const html = app.generateRawHtml( form );
 
-          //const nft = app.claimNFTs();
-
           // Setup Ajax call for api call.
           $.ajax( {
             type: "POST",
             data: { html: html },
-            url: process.env.API_URL,
+            url: process.env.API_URL + "api/screenshot",
             dataType: "json",
             beforeSend: () => {
               /**
@@ -280,8 +301,6 @@ const ethEnabled = async () => {
               // console.log(curr.value);
               console.log(form.find( ":input[name='tax_type']" ).val());
               console.log(form.find( "input[name='price[]']" ).val());
-              
-              
             },
             success: ( response ) => {
               // Check if response has success reponse?
@@ -312,6 +331,7 @@ const ethEnabled = async () => {
               btn.attr( "disabled", false );
             }
           } );
+          //const nft = app.claimNFTs();
         } )
 
         /**

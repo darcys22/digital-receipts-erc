@@ -4,10 +4,11 @@ const puppeteer = require( "puppeteer-core" );
 async function getScreenshot ( html ) {
   const browser = await puppeteer.launch( {
     args: chrome.args,
-    executablePath: await chrome.executablePath, // comment this line when working on localhost
+    //executablePath: await chrome.executablePath, // comment this line when working on localhost
     headless: chrome.headless, // comment this line when working on localhost
     //executablePath: "./node_modules/puppeteer/.local-chromium/mac-722234/chrome-win/chrome.exe", //uncomment this line when working on localhost Windows
     //executablePath: "./node_modules/puppeteer/.local-chromium/mac-901912/chrome-mac/Chromium.app/Contents/MacOS/Chromium", //uncomment this line when working on localhost Mac
+    executablePath: "./node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome", //uncomment this line when working on localhost Linux
   } );
 
   const page = await browser.newPage();

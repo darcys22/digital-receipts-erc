@@ -1,4 +1,5 @@
 const { getScreenshot } = require( "./chromium" );
+const path = require('path')
 
 const express = require( "express" );
 const cors = require( "cors" );
@@ -10,12 +11,13 @@ app.use( cors( { origin: true } ) );
 app.use( express.urlencoded( { extended: false } ) );
 app.use( express.json() );
 
-// set port 12345 for now
-const PORT = 12345;
-// N.D
+var options = {
+  extensions: ['htm', 'html', 'json'],
+}
+app.use(express.static(process.cwd() + '/public', options));
 
 // Handler to take screenshots of a URL.
-app.post( "/*", async ( req, res ) => {
+app.post( "/api/screenshot", async ( req, res ) => {
   try {
     const html = req.body.html;
     if ( html === "" || typeof html === "undefined" ) {
@@ -41,13 +43,13 @@ app.post( "/*", async ( req, res ) => {
 // are just placeholders so that we know the API can get an ID passed into it and is working.
 // N.D 12:30 - 05/08/2022
 
-app.get('/generated-receipt/:id',(req, res) => {
+app.get('/api/generated-receipt/:id',(req, res) => {
   
   const { id } = req.params;
 
       res.status(200).send(
         {
-          this: 'a test',
+          this: process.cwd() + '/public',
           param: id,
           numbers: '123321123123123123123'
         }
@@ -55,18 +57,10 @@ app.get('/generated-receipt/:id',(req, res) => {
 
   });
 
-  app.get('/generated-receipt', (req, res) => {
+  app.get('/api/generated-receipt', (req, res) => {
   
     res.status(400).send({ message: 'Generated receipt id is required for response'})
   
     });
-// N.D
-
-//set app to listen in on port 12345 temporarily, this will probably get moved to the proper URN once its working
-app.listen(
-  PORT,
-  () => console.log('Listening in on http://localhost:12345')
-)
-//N.D
 
 module.exports = app;

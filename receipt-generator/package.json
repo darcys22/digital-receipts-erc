@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "reference implementation for non-fungible digital receipts",
   "scripts": {
-    "api": "node api/index.js",
+    "api": "node dev.js",
     "dev": "parcel",
     "clean": "rm -rf dist .parcel-cache",
     "build": "npm run clean && parcel build --no-source-maps"
