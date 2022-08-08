@@ -8,30 +8,8 @@ import moment from "moment";
 
 // WEB3 STUFF
 import Web3 from 'web3';
-import Web3EthContract from "web3-eth-contract";
+import { ethers } from 'ethers'
 
-const ethEnabled = async () => {
-  const abiResponse = await fetch(process.env.API_URL + "config/abi.json", {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
-  window.abi = await abiResponse.json();
-  const configResponse = await fetch(process.env.API_URL + "config/config.json", {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
-  window.CONFIG = await configResponse.json();
-  if (window.ethereum) {
-    await window.ethereum.request({method: 'eth_requestAccounts'});
-    window.web3 = new Web3(window.ethereum);
-    return true;
-  }
-  return false;
-}
 
 /**
  * Do things when document is ready
@@ -59,9 +37,11 @@ const ethEnabled = async () => {
       app.downloadBtn = $( document.body ).find( "#download" );
       app.imagebase64 = null;
       app.processing = false;
+      app.web3ready = false;
 
       // Load event listeners.
       app.loadEvents();
+      app.loadWeb3();
 
     },
 
@@ -138,41 +118,22 @@ const ethEnabled = async () => {
     },
 
     claimNFTs: async () => {
-      if (window.ethereum) {
-        Web3EthContract.setProvider(window.ethereum);
+      if (typeof window.ethereum !== 'undefined' && app.web3ready) {
         try {
-          const accounts = await window.ethereum.request({
-            method: "eth_requestAccounts",
-          });
+          window.provider = new ethers.providers.Web3Provider(window.ethereum)
+          window.signer = window.provider.getSigner();
+          window.contract = new ethers.Contract(window.CONFIG.CONTRACT_ADDRESS, window.abi, window.signer)
           const networkId = await window.ethereum.request({
             method: "net_version",
           });
           if (networkId == window.CONFIG.NETWORK.ID) {
-            const SmartContractObj = new Web3EthContract(
-              window.abi,
-              window.CONFIG.CONTRACT_ADDRESS
-            );
             let gasLimit = window.CONFIG.GAS_LIMIT;
             console.log("Gas limit: ", gasLimit);
-            //setFeedback(`Minting your ${window.CONFIG.NFT_NAME}...`);
-            console.log(`TODO sean remove this Minting your ${window.CONFIG.NFT_NAME}...`);
-            await SmartContractObj.methods
-              .mint()
-              .send({
-                gasLimit: String(totalGasLimit),
-                to: window.CONFIG.CONTRACT_ADDRESS,
-                from: accounts[0],
-              })
-              .once("error", (err) => {
-                console.log(err);
-                utils.showError( "Sorry, something went wrong please try again later." );
-              })
-              .then((receipt) => {
-                //setFeedback(
-                  //`WOW, the ${window.CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
-                //);
-                console.log(`TODO sean delete this WOW, the ${window.CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`);
-              });
+            utils.showNotification(`Minting your ${window.CONFIG.NFT_NAME}...`);
+            const mintTx = await window.contract.mint({gasLimit: String(gasLimit)});
+            utils.showNotification(`WOW, the ${window.CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`);
+            await window.provider.waitForTransaction(mintTx.hash);
+            const receipt = await window.provider.getTransactionReceipt(mintTx.hash);
           } else {
             utils.showError(`Change network to ${window.CONFIG.NETWORK.NAME}.`);
           }
@@ -180,8 +141,62 @@ const ethEnabled = async () => {
           utils.showError("Something NFT went wrong.");
         }
       } else {
-        utils.showError("Install Metamask.");
+        utils.showError("Make sure metamask or some other wallet is connected.");
       }
+    },
+
+    loadWeb3: async () => {
+      const abiResponse = await fetch(process.env.API_URL + "config/abi.json", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      window.abi = await abiResponse.json();
+      const configResponse = await fetch(process.env.API_URL + "config/config.json", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      window.CONFIG = await configResponse.json();
+    },
+
+    ethEnabled: async () => {
+      if (window.ethereum) {
+        await window.ethereum.request({method: 'eth_requestAccounts'});
+        window.web3 = new Web3(window.ethereum);
+        app.checkWalletConnected();
+        return true;
+      }
+      return false;
+    },
+
+    checkWalletConnected: async () => {
+      const el = $( document.body ).find("#connect-wallet");
+      const btn = $( document.body ).find("button[type='submit']");
+      // Check if User is already connected by retrieving the accounts
+      web3.eth.getAccounts()
+        .then(function(addr){
+          if (addr.length > 0){
+            app.web3ready = true;
+            btn.attr( "disabled", false );
+            el.text("Connected: " + addr);
+            const duration = 5000;
+            setTimeout(function(){
+              app.checkWalletConnected();
+            },duration);
+          } else {
+            btn.attr( "disabled", true );
+            app.web3ready = false;
+            el.text("Connect Wallet");
+          }
+        })
+        .catch(function(err){
+          btn.attr( "disabled", true );
+          app.web3ready = false;
+          el.text("Connect Wallet");
+        });
     },
 
     /**
@@ -213,7 +228,7 @@ const ethEnabled = async () => {
          */
         .on( "click", "#connect-wallet", ( e ) => {
           e.preventDefault();
-          ethEnabled();
+          app.ethEnabled();
         } )
 
         /**
@@ -243,6 +258,7 @@ const ethEnabled = async () => {
 
           // Hide error notice.
           utils.hideError();
+          utils.hideNotification();
           form.removeClass( "was-validated" );
 
           // check if the input is valid using a 'valid' property
@@ -331,7 +347,7 @@ const ethEnabled = async () => {
               btn.attr( "disabled", false );
             }
           } );
-          //const nft = app.claimNFTs();
+          const nft = app.claimNFTs();
         } )
 
         /**

@@ -5,7 +5,8 @@ import "inputmask/dist/jquery.inputmask.min.js";
 const utils = {};
 
 // Define error selector.
-utils.errorSelector = "#receipt-form .alert";
+utils.errorSelector = "#receipt-form .alert-danger";
+utils.notificationSelector = "#receipt-form .alert-primary";
 
 /**
  * Return true if empty, null or undefined, else false
@@ -32,6 +33,10 @@ utils.nl2br = ( str, is_xhtml ) => {
 utils.showError = ( message = "" ) => {
   const el = $( document.body ).find( utils.errorSelector );
   el.html( message ).removeClass( "d-none" );
+  const duration = 5000;
+  setTimeout(function(){
+    utils.hideError();
+  },duration);
 };
 
 /**
@@ -39,6 +44,27 @@ utils.showError = ( message = "" ) => {
  */
 utils.hideError = () => {
   const el = $( document.body ).find( utils.errorSelector );
+  el.empty().addClass( "d-none" );
+};
+
+/**
+ * Display notification
+ * @param {string} message notification message text.
+ */
+utils.showNotification = ( message = "" ) => {
+  const el = $( document.body ).find( utils.notificationSelector );
+  el.html( message ).removeClass( "d-none" );
+  const duration = 10000;
+  setTimeout(function(){
+    utils.hideNotification();
+  },duration);
+};
+
+/**
+ * Hide notification notice
+ */
+utils.hideNotification = () => {
+  const el = $( document.body ).find( utils.notificationSelector );
   el.empty().addClass( "d-none" );
 };
 
