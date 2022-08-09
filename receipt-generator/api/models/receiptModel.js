@@ -66,5 +66,5 @@ module.exports = {
   createReceipt,
   getReceipt,
   deleteReceipt,
-  updateRecipt
+  updateReceipt
 };

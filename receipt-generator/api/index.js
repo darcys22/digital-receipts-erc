@@ -5,7 +5,7 @@ const express = require( "express" );
 const cors = require( "cors" );
 const app = express();
 
-var receiptModel = require("models/receiptModel.js");
+var receiptModel = require("./models/receiptModel.js");
 
 // use it before all route definitions
 app.use( cors( { origin: true } ) );
@@ -35,7 +35,7 @@ app.post("/api/screenshot", async ( req, res ) => {
       "Sorry, there was a Server  problem";
     response = res
       .status( 400 )
-      .send( { success: false, error: message, e: e } );
+      .send({success: false, error: message, e: e});
   }
   return response;
 });
@@ -46,27 +46,30 @@ app.post("/api/screenshot", async ( req, res ) => {
 // N.D 12:30 - 05/08/2022
 
 app.get('/api/generated-receipt/:id',(req, res) => {
-  
-  const { id } = req.params;
-
-      res.status(200).send(
-        {
-          this: process.cwd() + '/public',
-          param: id,
-          numbers: '123321123123123123123'
-        }
-      );
-
+  try {
+    const { id } = req.params;
+    if (!Number.isInteger(id))
+      throw "id is not a number"
+    receiptModel.getReceipt(id, 
+      function(data) {
+        res.status(200).send(data);
+      }
+    );
+  } catch ( e ) {
+    let message = e.message ?
+      e.message :
+      "sorry, there was a server  problem";
+    response = res
+      .status(400)
+      .send({success: false, error: message, e: e});
+  }
 });
 
 app.get('/api/generated-receipt', (req, res) => {
-
   res.status(400).send({ message: 'Generated receipt id is required for response'})
-
 });
 
 app.post("/api/receipt/add", function(req, res) {
-  //TODO sean check that req.id is a number
   try {
     if (!Number.isInteger(req.id))
       throw "id is not a number"
@@ -79,10 +82,10 @@ app.post("/api/receipt/add", function(req, res) {
   } catch ( e ) {
     let message = e.message ?
       e.message :
-      "Sorry, there was a Server  problem";
+      "sorry, there was a server  problem";
     response = res
       .status( 400 )
-      .send( { success: false, error: message, e: e } );
+      .send({success: false, error: message, e: e});
   }
 });
 

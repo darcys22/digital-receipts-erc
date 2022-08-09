@@ -4,9 +4,13 @@ pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract DigitalReceipt is ERC721, Ownable {
   using Strings for uint256;
+  using Counters for Counters.Counter;
+
+  Counters.Counter private _tokenIds;
 
   string baseURI;
   string public baseExtension = ".json";
@@ -17,8 +21,12 @@ contract DigitalReceipt is ERC721, Ownable {
     setBaseURI(_initBaseURI);
   }
 
-  function mint() external payable {
-    _safeMint(msg.sender, 1);
+  function mint() external payable returns (uint256) {
+    _tokenIds.increment();
+    uint256 newNftTokenId = _tokenIds.current();
+    _safeMint(msg.sender, newNftTokenId);
+
+    return newNftTokenId;
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
@@ -36,6 +44,11 @@ contract DigitalReceipt is ERC721, Ownable {
         ? string(abi.encodePacked(currentBaseURI, _tokenId.toString(), baseExtension))
         : "";
   }
+
+  function totalSupply() public view returns (uint256) {
+    return _tokenIds.current();
+  }
+
 
   function setBaseURI(string memory _newBaseURI) public onlyOwner {
     baseURI = _newBaseURI;

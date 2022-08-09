@@ -10,6 +10,13 @@ describe('DigitalReceipt', function () {
     await this.erc721.deployed();
   });
 
+  context('with no minted tokens', async function () {
+    it('has 0 totalSupply', async function () {
+      const supply = await this.erc721.totalSupply();
+      expect(supply).to.equal(0);
+    });
+  });
+
   context('mints', async function () {
     beforeEach(async function () {
       const [owner, addr1, addr2] = await ethers.getSigners();
@@ -41,10 +48,25 @@ describe('DigitalReceipt', function () {
           .withArgs(ZERO_ADDRESS, this.addr1address, 1);
         expect(await this.erc721.ownerOf(1)).to.equal(this.addr1address);
 
-        await ethers.provider.waitForTransaction(mintTx.hash);
-        const receipt = await ethers.provider.getTransactionReceipt(mintTx.hash);
-        //console.log(receipt);
+        const supply = await this.erc721.totalSupply();
+        expect(supply).to.equal(1);
+      });
 
+      it('successfully mints two tokens', async function () {
+        const mintTx = await this.erc721.connect(this.addr1).mint()
+        await expect(mintTx)
+          .to.emit(this.erc721, 'Transfer')
+          .withArgs(ZERO_ADDRESS, this.addr1address, 1);
+        expect(await this.erc721.ownerOf(1)).to.equal(this.addr1address);
+
+        const mint2Tx = await this.erc721.connect(this.addr1).mint()
+        await expect(mint2Tx)
+          .to.emit(this.erc721, 'Transfer')
+          .withArgs(ZERO_ADDRESS, this.addr1address, 2);
+        expect(await this.erc721.ownerOf(1)).to.equal(this.addr1address);
+
+        const supply = await this.erc721.totalSupply();
+        expect(supply).to.equal(2);
       });
 
       it('fails to withdraw if not owner', async function () {

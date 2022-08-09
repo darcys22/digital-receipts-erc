@@ -273,8 +273,25 @@ import { ethers } from 'ethers'
           // Generate receipt image raw html.
           const html = app.generateRawHtml( form );
 
+          const nftSupply = window.contract.totalSupply();
+
+          const receipt = {
+            date:  form.find( ":input[name='date']" ).val(),
+            business:  form.find( ":input[name='business']" ).val(),
+            address:  form.find( ":input[name='address']" ).val(),
+            currency:  form.find( ":input[name='currency']" ).val(),
+            taxType:  form.find( ":input[name='tax_type']" ).val(),
+            paymentType:  form.find( ":input[name='payment_type']" ).val(),
+            items:  form.find( "input[name='price[]']" ),
+            tax:  form.find( ":input[name='tax']" ).val(),
+            curr:  currency !== "" ? currency : "",
+            total:  0.0
+          }
+          console.log(receipt);
+
+
           // Setup Ajax call for api call.
-          $.ajax( {
+          $.ajax({
             type: "POST",
             data: { html: html },
             url: process.env.API_URL + "api/screenshot",
@@ -296,33 +313,25 @@ import { ethers } from 'ethers'
               app.processing = true;
               btn.attr( "disabled", true );
               modal.close();
-
-              // // Assigning form values to variables to prepare them for JSON
-              // // Only here so I can hijack the existing click event for this output.
-              // //-N.D
-
-              // Currently just futzing around with the variables here to see if I can get all the fields to output into the console first, and once I do
-              // I'll shove them into a JSON to prepare for the api
-              //N.D 12:30 - 05/08/2022
-
-              console.log(date.value);
-              console.log(business.value);
-              console.log(address.value);
-              console.log(currency.value);
-              // console.log(taxType.value);
-              console.log(form.find( ":input[name='payment_type']" ).val());
-              // console.log(items.value);
-
-              console.log(tax.value);
-              // console.log(curr.value);
-              console.log(form.find( ":input[name='tax_type']" ).val());
-              console.log(form.find( "input[name='price[]']" ).val());
             },
             success: ( response ) => {
               // Check if response has success reponse?
               if ( response.success ) {
                 // Store response data image base64 to app variable.
                 app.imagebase64 = response.image;
+                $.ajax({
+                  type: "POST",
+                  data: { id: nftSupply + 1, receipt },
+                  url: process.env.API_URL + "api/receipt/add",
+                  dataType: "json",
+                  success: (response) => {
+                      const nft = app.claimNFTs();
+                  },
+                  error: () => {
+                    // Show error.
+                    utils.showError( "Sorry, something went wrong, please try after sometime." );
+                  },
+                });
                 // Activate donwload button.
                 app.downloadBtn.attr( "disabled", false );
                 // Set new image data to element
@@ -346,9 +355,8 @@ import { ethers } from 'ethers'
               // Activate submit button.
               btn.attr( "disabled", false );
             }
-          } );
-          const nft = app.claimNFTs();
-        } )
+          });
+        })
 
         /**
          * Click event to download image.
