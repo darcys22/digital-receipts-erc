@@ -132,8 +132,8 @@ import { ethers } from 'ethers'
             utils.showNotification(`Minting your ${window.CONFIG.NFT_NAME}...`);
             const mintTx = await window.contract.mint({gasLimit: String(gasLimit)});
             utils.showNotification(`WOW, the ${window.CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`);
-            await window.provider.waitForTransaction(mintTx.hash);
-            const receipt = await window.provider.getTransactionReceipt(mintTx.hash);
+            //await window.provider.waitForTransaction(mintTx.hash);
+            //const receipt = await window.provider.getTransactionReceipt(mintTx.hash);
           } else {
             utils.showError(`Change network to ${window.CONFIG.NETWORK.NAME}.`);
           }
@@ -273,7 +273,6 @@ import { ethers } from 'ethers'
           // Generate receipt image raw html.
           const html = app.generateRawHtml( form );
 
-          const nftSupply = window.contract.totalSupply();
 
           const receipt = {
             date:  form.find( ":input[name='date']" ).val(),
@@ -282,13 +281,11 @@ import { ethers } from 'ethers'
             currency:  form.find( ":input[name='currency']" ).val(),
             taxType:  form.find( ":input[name='tax_type']" ).val(),
             paymentType:  form.find( ":input[name='payment_type']" ).val(),
-            items:  form.find( "input[name='price[]']" ),
+            //items:  form.find( "input[name='price[]']" ),
             tax:  form.find( ":input[name='tax']" ).val(),
-            curr:  currency !== "" ? currency : "",
+            //curr:  currency !== "" ? currency : "",
             total:  0.0
           }
-          console.log(receipt);
-
 
           // Setup Ajax call for api call.
           $.ajax({
@@ -314,28 +311,31 @@ import { ethers } from 'ethers'
               btn.attr( "disabled", true );
               modal.close();
             },
-            success: ( response ) => {
+            success: async ( response ) => {
               // Check if response has success reponse?
               if ( response.success ) {
                 // Store response data image base64 to app variable.
                 app.imagebase64 = response.image;
-                $.ajax({
-                  type: "POST",
-                  data: { id: nftSupply + 1, receipt },
-                  url: process.env.API_URL + "api/receipt/add",
-                  dataType: "json",
-                  success: (response) => {
-                      const nft = app.claimNFTs();
-                  },
-                  error: () => {
-                    // Show error.
-                    utils.showError( "Sorry, something went wrong, please try after sometime." );
-                  },
+
+                const nft = await app.claimNFTs();
+                const nftSupply = await window.contract.totalSupply();
+                console.log(receipt);
+                // create request object
+                const data = {id: nftSupply.toNumber(), receipt}
+                const request = new Request(process.env.API_URL + "api/receipt/add", {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: new Headers({
+                        'Content-Type': 'application/json'
+                    })
                 });
+                await fetch(request)
+                  .then(res => res.json())
+                  .then(res => console.log(res));
                 // Activate donwload button.
-                app.downloadBtn.attr( "disabled", false );
+                app.downloadBtn.attr("disabled", false);
                 // Set new image data to element
-                $( app.imageElem ).attr( "src", app.imagebase64 );
+                $(app.imageElem).attr("src", app.imagebase64);
                 // Open modal.
                 modal.open();
               } else {

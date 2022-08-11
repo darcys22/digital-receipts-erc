@@ -71,10 +71,10 @@ app.get('/api/generated-receipt', (req, res) => {
 
 app.post("/api/receipt/add", function(req, res) {
   try {
-    if (!Number.isInteger(req.id))
+    if (!Number.isInteger(req.body.id))
       throw "id is not a number"
 
-    receiptModel.createReceipt(req.id, JSON.stringify(req.receipt), 
+    receiptModel.createReceipt(req.body.id, JSON.stringify(req.body.receipt), 
       function(data) {
         res.status(200).send(data);
       }
