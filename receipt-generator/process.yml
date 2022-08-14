@@ -1,0 +1,3 @@
+apps:
+    - name: digital-receipts-nft
+      script: ./api/index.js

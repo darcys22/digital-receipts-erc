@@ -14,7 +14,23 @@ yarn dev
 yarn api
 ```
 
-## Giving Recognition to the original author of the non-cryptocurrency related receipt app
+## Docker
+Building
+```
+docker build -t receipt-generator .
+```
+
+Running
+```
+docker run -p 3000:3000 receipt-generator
+```
+
+## Author
+
+Sean Darcy <darcys22@gmail.com>
+- Twitter: [https://twitter.com/darcys22](https://twitter.com/darcys22)
+
+## Attribution
 
 Please show support to the original creator of the receipt generator app. I simply forked it and added crypto! Star the repository and follow him on [Twitter](https://twitter/vijayhardaha/) if this project helped you!
 

@@ -7,6 +7,8 @@ const app = express();
 
 var receiptModel = require("./models/receiptModel.js");
 
+const port = process.env.PORT || 3000;
+
 // use it before all route definitions
 app.use( cors( { origin: true } ) );
 
@@ -14,9 +16,12 @@ app.use( express.urlencoded( { extended: false } ) );
 app.use( express.json() );
 
 var options = {
-  extensions: ['htm', 'html', 'json'],
+  extensions: ['htm', 'html', 'json', 'js'],
 }
 app.use(express.static(process.cwd() + '/public', options));
+if (process.env.NODE_ENV == 'production') {
+  app.use(express.static(process.cwd() + '/dist'));
+}
 
 // Handler to take screenshots of a URL.
 app.post("/api/screenshot", async ( req, res ) => {
@@ -32,9 +37,9 @@ app.post("/api/screenshot", async ( req, res ) => {
   } catch ( e ) {
     let message = e.message ?
       e.message :
-      "Sorry, there was a Server  problem";
+      "Sorry, there was a server problem";
     response = res
-      .status( 400 )
+      .status(400)
       .send({success: false, error: message, e: e});
   }
   return response;
@@ -58,7 +63,7 @@ app.get('/api/generated-receipt/:id',(req, res) => {
   } catch ( e ) {
     let message = e.message ?
       e.message :
-      "sorry, there was a server  problem";
+      "Sorry, there was a server problem";
     response = res
       .status(400)
       .send({success: false, error: message, e: e});
@@ -82,11 +87,13 @@ app.post("/api/receipt/add", function(req, res) {
   } catch ( e ) {
     let message = e.message ?
       e.message :
-      "sorry, there was a server  problem";
+      "Sorry, there was a server problem";
     response = res
-      .status( 400 )
+      .status(400)
       .send({success: false, error: message, e: e});
   }
 });
 
-module.exports = app;
+app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+});
