@@ -146,14 +146,17 @@ import { ethers } from 'ethers'
     },
 
     loadWeb3: async () => {
-      const abiResponse = await fetch(process.env.API_URL + "config/abi.json", {
+          var base_url = "";
+          if (process.env.NODE_ENV != 'production')
+            base_url = "http://localhost:3000/";
+      const abiResponse = await fetch(base_url + "config/abi.json", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
       });
       window.abi = await abiResponse.json();
-      const configResponse = await fetch(process.env.API_URL + "config/config.json", {
+      const configResponse = await fetch(base_url + "config/config.json", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -287,11 +290,15 @@ import { ethers } from 'ethers'
             total:  0.0
           }
 
+          var url = "api/screenshot";
+          if (process.env.NODE_ENV != 'production')
+            url = "http://localhost:3000/api/screenshot";
+
           // Setup Ajax call for api call.
           $.ajax({
             type: "POST",
             data: { html: html },
-            url: process.env.API_URL + "api/screenshot",
+            url: url,
             dataType: "json",
             beforeSend: () => {
               /**
@@ -322,7 +329,10 @@ import { ethers } from 'ethers'
                 console.log(receipt);
                 // create request object
                 const data = {id: nftSupply.toNumber(), receipt}
-                const request = new Request(process.env.API_URL + "api/receipt/add", {
+                var url = "api/receipt/add";
+                if (process.env.NODE_ENV != 'production')
+                  url = "http://localhost:3000/api/receipt/add";
+                const request = new Request(url, {
                     method: 'POST',
                     body: JSON.stringify(data),
                     headers: new Headers({
