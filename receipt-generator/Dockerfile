@@ -55,8 +55,7 @@ COPY package*.json process.yml ./
 USER node
 
 # Install libraries as user node
-#RUN npm i --only=production --omit=dev
-RUN npm i
+RUN npm i --only=production
 
 # Copy js files and change ownership to user node
 COPY --chown=node:node --from=builder /app/dist ./dist

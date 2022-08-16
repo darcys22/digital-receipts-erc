@@ -8,8 +8,7 @@ import moment from "moment";
 
 // WEB3 STUFF
 import Web3 from 'web3';
-import { ethers } from 'ethers'
-
+import { ethers } from 'ethers';
 
 /**
  * Do things when document is ready
@@ -128,7 +127,6 @@ import { ethers } from 'ethers'
           });
           if (networkId == window.CONFIG.NETWORK.ID) {
             let gasLimit = window.CONFIG.GAS_LIMIT;
-            console.log("Gas limit: ", gasLimit);
             utils.showNotification(`Minting your ${window.CONFIG.NFT_NAME}...`);
             const mintTx = await window.contract.mint({gasLimit: String(gasLimit)});
             utils.showNotification(`WOW, the ${window.CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`);
@@ -326,7 +324,6 @@ import { ethers } from 'ethers'
 
                 const nft = await app.claimNFTs();
                 const nftSupply = await window.contract.totalSupply();
-                console.log(receipt);
                 // create request object
                 const data = {id: nftSupply.toNumber(), receipt}
                 var url = "api/receipt/add";
