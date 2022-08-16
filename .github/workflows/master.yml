@@ -5,10 +5,6 @@ on:
     branches:
       - master 
 
-defaults:
-  run:
-    working-directory: receipt-generator
-
 env:
   CONTAINER_NAME: "nft-digital-receipts"
   IMAGE_NAME: "nft-digital-receipts"
@@ -32,6 +28,8 @@ jobs:
         with:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
           push: true
+          context: receipt-generator
+          file: receipt-generator/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
