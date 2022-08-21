@@ -52,5 +52,5 @@ jobs:
             # Set env variables
 
             # Run a new container from a new image
-            docker run -d --pull always --network host --name $(echo $CONTAINER_NAME) \
+            docker run -v ~/database:/home/node/database -d --pull always --network host --name $(echo $CONTAINER_NAME) \
             ${{ secrets.DOCKERHUB_USERNAME }}/$(echo $IMAGE_NAME):latest

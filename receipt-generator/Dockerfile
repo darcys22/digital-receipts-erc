@@ -33,6 +33,7 @@ FROM node AS final
 
 # Set node environment to production
 ENV NODE_ENV production
+ENV DB_DIR /home/node/database
 
 # Update the system
 RUN apk --no-cache -U upgrade
