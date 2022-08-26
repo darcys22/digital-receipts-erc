@@ -308,7 +308,7 @@ import { ethers } from 'ethers';
               const nft = await app.claimNFTs();
               const nftSupply = await window.contract.totalSupply();
               // create request object
-              const data = {id: nftSupply.toNumber(), receipt}
+              const data = {id: nftSupply.toNumber() + 1, receipt}
               const request = new Request("api/receipt/add", {
                   method: 'POST',
                   body: JSON.stringify(data),
