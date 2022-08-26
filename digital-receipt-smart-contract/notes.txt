@@ -9,10 +9,10 @@ Private Key for deployer:
 
 ## Test contracts
 Contract Address:
-0xC7BdacF7983f33a8d3B3AF3ABc720d30f66f76E5
+0xb81fA1acf664A70b706fCfa301c54Da490FC50FF
 
 https://goerli.etherscan.io/
-https://goerli.etherscan.io/address/0xC7BdacF7983f33a8d3B3AF3ABc720d30f66f76E5
+https://goerli.etherscan.io/address/0xb81fA1acf664A70b706fCfa301c54Da490FC50FF
 
 ## website to get abi encoded construction params
 https://abi.hashex.org/
