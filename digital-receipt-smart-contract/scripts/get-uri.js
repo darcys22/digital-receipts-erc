@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const fs = require('fs')
 
 const name = "DigitalReceipt"
-const id = 59
+const id = 3
 
 async function main() {
 

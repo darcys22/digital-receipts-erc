@@ -34,7 +34,7 @@ contract DigitalReceipt is ERC721, Ownable {
 
   function tokenURI(uint256 _tokenId) override public view returns (string memory) {
     require(
-      _exists(_tokenId),
+      _tokenId <= _tokenIds.current(),
       "ERC721Metadata: URI query for nonexistent token"
     );
 

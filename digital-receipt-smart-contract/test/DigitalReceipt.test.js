@@ -86,14 +86,20 @@ describe('DigitalReceipt', function () {
       this.addr1 = addr1;
       this.addr1address = await this.addr1.getAddress();
       this.addr2 = addr2;
-      await this.erc721.connect(this.owner).mint();
     });
 
     describe('token URI', function () {
       it('shows the not revealed location by default', async function () {
-        await this.erc721.connect(this.owner).setBaseURI("baseuri/");
+        await this.erc721.connect(this.owner).setBaseURI("https://receipts.darcyfinancial.com/api/receipt/view/");
+        await expect(
+          this.erc721.tokenURI(1)
+        ).to.be.revertedWith('ERC721Metadata: URI query for nonexistent token');
+        const mintTx = await this.erc721.connect(this.owner).mint();
+        await expect(mintTx)
+          .to.emit(this.erc721, 'Transfer')
+          .withArgs(ZERO_ADDRESS, this.owneraddress, 1);
         await expect(await this.erc721.tokenURI(1))
-          .to.equal("baseuri/1.json");
+          .to.equal("https://receipts.darcyfinancial.com/api/receipt/view/1");
       });
     });
   });
