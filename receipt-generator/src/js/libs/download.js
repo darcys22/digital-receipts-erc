@@ -34,7 +34,7 @@ download.save = ( uri = null ) => {
   const date = new Date();
   const blob = download.base64ToBlob( uri );
   const time = date.getTime();
-  const file = `recipt-${time}.png`;
+  const file = `receipt-${time}.png`;
   console.log("blob")
   saveAs( blob, file );
 };

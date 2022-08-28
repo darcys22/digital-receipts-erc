@@ -34,6 +34,7 @@ import { ethers } from 'ethers';
       app.imageElem = ".preview-box img";
       app.defaultImage = $( app.imageElem ).attr( "src" );
       app.downloadBtn = $( document.body ).find( "#download" );
+      app.viewNFTBtn = $( document.body ).find( "#view-nft" );
       app.imagebase64 = null;
       app.processing = false;
       app.web3ready = false;
@@ -289,6 +290,7 @@ import { ethers } from 'ethers';
           $( app.imageElem ).attr( "src", app.defaultImage );
           app.downloadBtn.attr( "disabled", true );
           app.imagebase64 = null;
+          app.nftTokenID = null;
           app.processing = true;
           btn.attr("disabled", true);
           modal.close();
@@ -307,8 +309,9 @@ import { ethers } from 'ethers';
 
               const nft = await app.claimNFTs();
               const nftSupply = await window.contract.totalSupply();
+              const nftID = nftSupply.toNumber() + 1;
               // create request object
-              const data = {id: nftSupply.toNumber() + 1, receipt}
+              const data = {id: nftID, receipt}
               const request = new Request("api/receipt/add", {
                   method: 'POST',
                   body: JSON.stringify(data),
@@ -320,7 +323,11 @@ import { ethers } from 'ethers';
                 .then(res => res.json())
                 .then(res => {
                   if (res.success)
+                  {
                     utils.showNotification(res.message);
+                    app.nftTokenID = nftID;
+                    app.viewNFTBtn.attr("disabled", false);
+                  }
                   else
                     utils.showError(res.error);
                 });
@@ -352,6 +359,17 @@ import { ethers } from 'ethers';
           e.preventDefault();
           // Download image.
           download.save(app.imagebase64);
+        } )
+
+        /**
+         * Click event to view nft.
+         * @param {event} e event object.
+         */
+        .on( "click", "#view-nft", ( e ) => {
+          e.preventDefault();
+          // external link to pixxiti
+          download.save(app.imagebase64);
+          window.open(window.CONFIG.PREVIEW_LINK + app.nftTokenID.toString(), '_blank');
         } )
 
         /**
