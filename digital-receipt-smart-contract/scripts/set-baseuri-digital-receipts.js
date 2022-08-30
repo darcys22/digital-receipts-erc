@@ -26,8 +26,9 @@ async function main() {
   const digitalreceipts = await Token.attach(data);
 
   const transaction = await digitalreceipts.setBaseURI(baseuri);
+  const receipt = await ethers.provider.getTransactionReceipt(transaction.hash);
 
-  console.log(transaction);
+  console.log(receipt);
 
   console.log(
     '  ',

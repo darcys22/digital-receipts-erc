@@ -25,6 +25,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/test-helpers": "^0.5.15",
+    "axios": "^0.27.2",
     "chai": "^4.3.4",
     "eslint": "^8.7.0",
     "eslint-plugin-mocha": "^10.0.3",
