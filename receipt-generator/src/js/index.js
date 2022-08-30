@@ -23,8 +23,6 @@ import { ethers } from 'ethers';
       /**
        * Setup inputmask.
        */
-      //TODO sean remove this
-      window.generateReceipt = app.generateReceiptObject;
       utils.setupInputMask();
 
       /**
@@ -383,7 +381,6 @@ import { ethers } from 'ethers';
         .on( "click", "#view-nft", ( e ) => {
           e.preventDefault();
           // external link to pixxiti
-          download.save(app.imagebase64);
           window.open(window.CONFIG.PREVIEW_LINK + app.nftTokenID.toString(), '_blank');
         } )
 

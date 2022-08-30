@@ -88,8 +88,8 @@ describe('DigitalReceipt', function () {
       this.addr2 = addr2;
     });
 
-    describe('token URI', function () {
-      it('shows the not revealed location by default', async function () {
+    describe('token URI after one mint', function () {
+      it('shows the correct location', async function () {
         await this.erc721.connect(this.owner).setBaseURI("https://receipts.darcyfinancial.com/api/receipt/view/");
         await expect(
           this.erc721.tokenURI(1)
@@ -100,6 +100,29 @@ describe('DigitalReceipt', function () {
           .withArgs(ZERO_ADDRESS, this.owneraddress, 1);
         await expect(await this.erc721.tokenURI(1))
           .to.equal("https://receipts.darcyfinancial.com/api/receipt/view/1");
+      });
+    });
+
+    describe('token URI after minting lots', function () {
+      it('shows the correct location', async function () {
+        await this.erc721.connect(this.owner).setBaseURI("https://receipts.darcyfinancial.com/api/receipt/view/");
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        await this.erc721.connect(this.owner).mint();
+        const mintTx = await this.erc721.connect(this.owner).mint();
+        await expect(mintTx)
+          .to.emit(this.erc721, 'Transfer')
+        await expect(await this.erc721.tokenURI(12))
+          .to.equal("https://receipts.darcyfinancial.com/api/receipt/view/12");
       });
     });
   });
