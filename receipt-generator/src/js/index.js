@@ -318,7 +318,15 @@ import { ethers } from 'ethers';
               const nftSupply = await window.contract.totalSupply();
               const nftID = nftSupply.toNumber() + 1;
               // create request object
-              const data = {id: nftID, receipt}
+              const receiptMetadata = {
+                name: "NFTDR",
+                description: "A digital receipt from receipts.darcyfinancial.com",
+                image: app.imagebase64,
+                receipt: receipt,
+                signature: "TODO"
+
+              }
+              const data = {id: nftID, receipt: receiptMetadata}
               const request = new Request("api/receipt/add", {
                   method: 'POST',
                   body: JSON.stringify(data),
