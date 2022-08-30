@@ -23,6 +23,8 @@ import { ethers } from 'ethers';
       /**
        * Setup inputmask.
        */
+      //TODO sean remove this
+      window.generateReceipt = app.generateReceiptObject;
       utils.setupInputMask();
 
       /**
@@ -50,17 +52,7 @@ import { ethers } from 'ethers';
      * @param {element} form form element.
      * @return {string} receipt html.
      */
-    generateRawHtml: ( form ) => {
-      const date = form.find( ":input[name='date']" ).val();
-      const business = form.find( ":input[name='business']" ).val();
-      const address = form.find( ":input[name='address']" ).val();
-      const currency = form.find( ":input[name='currency']" ).val();
-      const taxType = form.find( ":input[name='tax_type']" ).val();
-      const paymentType = form.find( ":input[name='payment_type']" ).val();
-      const items = form.find( "input[name='price[]']" );
-
-      let tax = form.find( ":input[name='tax']" ).val();
-      let curr = currency !== "" ? currency : "";
+    generateRawHtml: ( receipt ) => {
       let total = 0.0;
 
       let html = '<!DOCTYPE html>';
@@ -77,14 +69,52 @@ import { ethers } from 'ethers';
       html += '<body>';
       html += '<div id="receipt">';
       html += '<div class="address">';
-      html += '<p>' + business + '</p>';
-      html += '<p>' + utils.nl2br( address ) + '</p>';
+      html += '<p>' + receipt.business + '</p>';
+      html += '<p>' + utils.nl2br( receipt.address ) + '</p>';
       html += '</div>';
-      html += '<p class="date">' + utils.nl2br( date ) + '</p>';
-      html += '<p class="payment"><strong>Payment Type:</strong>' + paymentType + '</p>';
+      html += '<p class="date">' + utils.nl2br( receipt.date ) + '</p>';
+      html += '<p class="payment"><strong>Payment Type:</strong>' + receipt.paymentType + '</p>';
       html += '<table class="table">';
       html += '<thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Price</th></tr></thead>';
       html += '<tbody>';
+
+      receipt.items.forEach( (i) => {
+        total = parseFloat( parseFloat( total ) + parseFloat( i.itemTotal ) ).toFixed( 2 );
+        html += '<tr><td>' + i.itemName + '</td><td>' + i.qty + '</td><td>' + receipt.currency + '' + i.price + '</td><td>' + receipt.currency + '' + i.itemTotal + '</td></tr>';
+      } );
+
+      html += '</tbody>';
+      html += '<tfoot>';
+      html += '<tr><th colspan="3">Subtotal:</th><td>' + receipt.currency + '' + total + '</td></tr>';
+
+      if ( receipt.tax !== "" ) {
+        total = parseFloat( parseFloat( total ) + parseFloat( receipt.tax ) ).toFixed( 2 );
+        html += '<tr><th colspan="3">' + receipt.taxType + ':</th><td>' + receipt.currency + '' + receipt.tax + '</td></tr>';
+      }
+
+      html += '<tr><th colspan="3">Total:</th><td>' + receipt.currency + '' + total + '</td></tr>';
+      html += '<tfoot></table>';
+      html += '<p id="footer">Thank You!</p>';
+      html += '</div>';
+      html += '</body>';
+      return html;
+    },
+
+    generateReceiptObject: () => {
+      const form = $("#receipt-form");
+
+      var receipt = {
+        date:  form.find( ":input[name='date']" ).val(),
+        business:  form.find( ":input[name='business']" ).val(),
+        address:  form.find( ":input[name='address']" ).val(),
+        currency:  form.find( ":input[name='currency']" ).val(),
+        taxType:  form.find( ":input[name='tax_type']" ).val(),
+        paymentType:  form.find( ":input[name='payment_type']" ).val(),
+        tax:  form.find( ":input[name='tax']" ).val(),
+        items: [],
+      }
+
+      const items = form.find( "input[name='price[]']" );
 
       items.each( ( i, el ) => {
         let parent = $( el ).closest( "tr" );
@@ -93,28 +123,15 @@ import { ethers } from 'ethers';
         let qty = parent.find( "input[name='qty[]']" ).val();
         let itemName = parent.find( "input[name='item_name[]']" ).val();
         let itemTotal = ( parseFloat( price ) * parseInt( qty ) ).toFixed( 2 );
-        total = parseFloat( parseFloat( total ) + parseFloat( itemTotal ) ).toFixed( 2 );
-        html += '<tr><td>' + itemName + '</td><td>' + qty + '</td><td>' + curr + '' + price + '</td><td>' + curr + '' + itemTotal + '</td></tr>';
+        receipt.items.push({
+          itemName:  itemName,
+          qty:  qty,
+          price:  price,
+          itemTotal:  itemTotal,
+        })
       } );
 
-      html += '</tbody>';
-      html += '<tfoot>';
-      html += '<tr><th colspan="3">Subtotal:</th><td>' + curr + '' + total + '</td></tr>';
-
-      if ( tax !== "" ) {
-        tax = parseFloat( tax ).toFixed( 2 );
-        total = parseFloat( parseFloat( total ) + parseFloat( tax ) ).toFixed( 2 );
-        html += '<tr><th colspan="3">' + taxType + ':</th><td>' + curr + '' + tax + '</td></tr>';
-        
-        console.log("DEV: tax does not equal null")
-      }
-
-      html += '<tr><th colspan="3">Total:</th><td>' + curr + '' + total + '</td></tr>';
-      html += '<tfoot></table>';
-      html += '<p id="footer">Thank You!</p>';
-      html += '</div>';
-      html += '</body>';
-      return html;
+      return receipt;
     },
 
     claimNFTs: async () => {
@@ -269,21 +286,11 @@ import { ethers } from 'ethers';
           // Define submit button const.
           const btn = form.find( "button[type='submit']" );
 
-          // Generate receipt image raw html.
-          const html = app.generateRawHtml(form);
+          const receipt = app.generateReceiptObject();
 
-          const receipt = {
-            date:  form.find( ":input[name='date']" ).val(),
-            business:  form.find( ":input[name='business']" ).val(),
-            address:  form.find( ":input[name='address']" ).val(),
-            currency:  form.find( ":input[name='currency']" ).val(),
-            taxType:  form.find( ":input[name='tax_type']" ).val(),
-            paymentType:  form.find( ":input[name='payment_type']" ).val(),
-            //items:  form.find( "input[name='price[]']" ),
-            tax:  form.find( ":input[name='tax']" ).val(),
-            //curr:  currency !== "" ? currency : "",
-            total:  0.0
-          }
+          // Generate receipt image raw html.
+          const html = app.generateRawHtml(receipt);
+
 
           // Setup Ajax call for api call.
           utils.loader( true );
