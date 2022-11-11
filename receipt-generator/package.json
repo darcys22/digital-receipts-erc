@@ -10,7 +10,6 @@
     "docker-build": "docker build -t receipt-generator .",
     "docker-run": "docker run -p 3000:3000 receipt-generator",
     "docker-run-persist": "docker run -v ~/database:/home/node/database -p 3000:3000 --user $(id -u node):$(getent group node | cut -d: -f3) receipt-generator"
-
   },
   "source": "index.html",
   "repository": {
@@ -35,6 +34,7 @@
     "not Explorer <= 11"
   ],
   "dependencies": {
+    "alchemy-sdk": "^2.2.1",
     "bootstrap": "^5.1.3",
     "bootstrap-material-datetimepicker": "^2.7.3",
     "chrome-aws-lambda": "^10.1.0",
