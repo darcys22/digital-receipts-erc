@@ -9,6 +9,14 @@ import moment from "moment";
 // WEB3 STUFF
 import Web3 from 'web3';
 import { ethers } from 'ethers';
+import { Network, Alchemy } from 'alchemy-sdk';
+
+const settings = {
+    apiKey: "i4iCAJmjOHWXJXYFSlW1eQkZONpR81Te",
+    network: Network.ETH_GOERLI,
+};
+
+const alchemy = new Alchemy(settings);
 
 /**
  * Do things when document is ready
@@ -138,6 +146,7 @@ import { ethers } from 'ethers';
           window.provider = new ethers.providers.Web3Provider(window.ethereum)
           window.signer = window.provider.getSigner();
           window.contract = new ethers.Contract(window.CONFIG.CONTRACT_ADDRESS, window.abi, window.signer)
+          window.fastcontract = new ethers.Contract(window.CONFIG.CONTRACT_ADDRESS, window.abi, await alchemy.config.getProvider())
           const networkId = await window.ethereum.request({
             method: "net_version",
           });
@@ -313,7 +322,7 @@ import { ethers } from 'ethers';
 
 
               const nft = await app.claimNFTs();
-              const nftSupply = await window.contract.totalSupply();
+              const nftSupply = await window.fastcontract.totalSupply();
               const nftID = nftSupply.toNumber() + 1;
               // create request object
               const receiptMetadata = {
